@@ -15,6 +15,7 @@ res = []
 for j in search(query, tld="com", num=10, stop=10, pause=2):
     res.append(j)
 
+
 url = res[1]
 
 # send a request
@@ -29,10 +30,26 @@ companyData = []  # a list of company data
 # getting data
 data = soup.find('div', attrs = {'class':'view-content container'}) 
 
+
 # finding company info
 for row in data.findAll('li', attrs = {'class':'views-row'}):
-    companyData.append(row)
+    companyDat = {}
+    companyDat['name'] = row.h3.a.span.text.strip()
+    companyDat['link'] = row.h3.a['href'].strip()
+    companyDat['rating'] = row.find('div', attrs = {'class':'widget-total-reviews'})
+    companyDat['reviews'] = row.find('div', attrs = {'class':'widget-reviews-count'})
+    companyData.append(companyDat)
 
-print(len(companyData))
-print(companyData[0])
+for data in companyData:
+    if(data['rating'] != None):
+        data['rating'] = data['rating'].text.strip()
+    else:
+        companyData.remove(data)
 
+for data in companyData:
+    if(data['reviews'] != None):
+        data['reviews'] = data['reviews'].find('span', attrs = {'class':'count'}).text.strip()
+    else:
+        companyData.remove(data)
+
+print(companyData)
